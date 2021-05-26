@@ -13,7 +13,7 @@ import { AtualizarJogadorDTO } from './dtos/atualizar-jogador.dto';
 import { CriarJogadorDTO } from './dtos/criar-jogador.dto';
 import { Jogador } from './interfaces/jogador.interface';
 import { JogadoresService } from './jogadores.service';
-import { JogadoresValidacaoParametrosPipe } from './pipes/jogadores-validacao-parametros-pipe';
+import { ValidacaoParametrosPipe } from '../common/pipes/validacao-parametros-pipe';
 @Controller('api/v1/jogadores')
 export class JogadoresController {
 	constructor(private readonly jogadoresService: JogadoresService) {}
@@ -30,7 +30,7 @@ export class JogadoresController {
 	@UsePipes(ValidationPipe)
 	async atualizarJogador(
 		@Body() atualizarJogadorDto: AtualizarJogadorDTO,
-		@Param('_id', JogadoresValidacaoParametrosPipe) _id: string,
+		@Param('_id', ValidacaoParametrosPipe) _id: string,
 	): Promise<Jogador> {
 		const jogador = await this.jogadoresService.atualizarJogador(
 			_id,
@@ -52,7 +52,7 @@ export class JogadoresController {
 
 	@Delete('/:_id')
 	async deletarJogador(
-		@Param('_id', JogadoresValidacaoParametrosPipe) _id: string,
+		@Param('_id', ValidacaoParametrosPipe) _id: string,
 	) {
 		await this.jogadoresService.deletarJogador(_id);
 		return JSON.stringify('Jogador deletado com sucesso!');
