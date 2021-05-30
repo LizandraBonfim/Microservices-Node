@@ -42,6 +42,22 @@ export class CategoriasService {
 		return categoriaEncontrada;
 	}
 
+	async consultarCategoriaDoJogador(_id: any): Promise<Categoria> {
+		const jogadores = await this.jogadoresService.consultarTodosJogadores();
+
+		const jogadorFilter = jogadores.filter((jogador) => jogador._id == _id);
+
+		if (jogadorFilter.length == 0) {
+			throw new BadRequestException(`Jogador não encontrado!`);
+		}
+
+		return await this.categoriaModel
+			.findOne()
+			.where('jogadores')
+			.in(_id)
+			.exec();
+	}
+
 	async atualizarCategoriaPeloId(
 		_id: string,
 		categoriaDto: AtualizarCategoriaDTO,
