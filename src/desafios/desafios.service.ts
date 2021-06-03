@@ -3,14 +3,20 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CategoriasService } from 'src/categorias/categorias.service';
 import { JogadoresService } from 'src/jogadores/jogadores.service';
+import { AtribuirPartidaDTO } from './dtos/atribuir-partida-dto';
 import { AtualizarDesafioDTO } from './dtos/atualizar-desafio-dto';
 import { CriarDesafioDto } from './dtos/criar-desafio-dto';
-import { Desafio, DesafioStatus } from './interfaces/desafio.interface';
+import {
+	Desafio,
+	DesafioStatus,
+	Partida,
+} from './interfaces/desafio.interface';
 
 @Injectable()
 export class DesafiosService {
 	constructor(
 		@InjectModel('Desafio') private readonly desafioModel: Model<Desafio>,
+		@InjectModel('Partida') private readonly partidaModel: Model<Partida>,
 		private readonly jogadoresService: JogadoresService,
 		private readonly categoriasService: CategoriasService,
 	) {}
@@ -94,6 +100,24 @@ export class DesafiosService {
 		await this.consultarDesafioPorId(_id);
 		await this.desafioModel
 			.findByIdAndUpdate({ _id }, { dataHoraDesafio, status })
+			.exec();
+	}
+
+	async atribuirPartida(_id: string, atribuirPartidaDTO: AtribuirPartidaDTO) {
+		const desafio = await this.consultarDesafioPorId(_id);
+
+		const novaPartida = new this.partidaModel(atribuirPartidaDTO);
+		novaPartida.categoria = desafio.categoria;
+		novaPartida.jogadores = desafio.jogadores;
+
+		const partida = await novaPartida.save();
+
+		await this.consultarDesafioPorId(_id);
+		await this.desafioModel
+			.findByIdAndUpdate(
+				{ _id },
+				{ partida: partida.id, status: DesafioStatus.REALIZADO },
+			)
 			.exec();
 	}
 

@@ -11,10 +11,10 @@ import {
 } from '@nestjs/common';
 import { ValidacaoParametrosPipe } from 'src/common/pipes/validacao-parametros.pipe';
 import { DesafiosService } from './desafios.service';
+import { AtribuirPartidaDTO } from './dtos/atribuir-partida-dto';
 import { AtualizarDesafioDTO } from './dtos/atualizar-desafio-dto';
 import { CriarDesafioDto } from './dtos/criar-desafio-dto';
 import { Desafio } from './interfaces/desafio.interface';
-import { DesafioStatusValidacaoPipe } from './pipes/desafio-status-validation.pipe';
 
 @Controller('api/v1/desafios')
 export class DesafiosController {
@@ -49,6 +49,14 @@ export class DesafiosController {
 		console.log({ atualizarDesafioDto });
 		await this.desafioService.atualizarDesafioPartida(_id, atualizarDesafioDto);
 		return 'Jogador atualizado com sucesso!';
+	}
+
+	@Post('/:_id')
+	async atribuirPartida(
+		@Body(ValidationPipe) atribuirPartidaDTO: AtribuirPartidaDTO,
+		@Param('_id') _id: string,
+	) {
+		await this.desafioService.atribuirPartida(_id, atribuirPartidaDTO);
 	}
 
 	@Delete('/:_id')
